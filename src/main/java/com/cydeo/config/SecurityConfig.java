@@ -24,9 +24,9 @@ public class SecurityConfig {
         List<UserDetails> userList = new ArrayList<>();
 
         User user1 = new User("mike", passwordEncoder.encode("password"),
-                List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
+                List.of(new SimpleGrantedAuthority("ROLE_Admin")));
         User user2 = new User("Ozzy", passwordEncoder.encode("password"),
-                List.of(new SimpleGrantedAuthority("ROLE_MANAGER")));
+                List.of(new SimpleGrantedAuthority("ROLE_Manager")));
 
         userList.add(user1);
         userList.add(user2);
@@ -39,10 +39,14 @@ public class SecurityConfig {
 
         return http
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/user/**").hasRole("Admin")
+                        .requestMatchers("/project/**").hasRole("Manager")
+                        .requestMatchers("/task/**").hasRole("Manager")
+                        .requestMatchers("/task/employee/**").hasRole("Employee")
                         .requestMatchers(
                                 "/",
                                 "/login",
-                                "/fragments/**",         // everything within this folder is available for everyone
+                                "/fragments/**",
                                 "/images/**"
                         ).permitAll()
                         .anyRequest().authenticated())
