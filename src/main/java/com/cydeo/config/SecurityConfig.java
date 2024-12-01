@@ -17,41 +17,43 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
-    @Bean
-    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
-
-        List<UserDetails> userList = new ArrayList<>();
-
-        User user1 = new User("mike", passwordEncoder.encode("password"),
-                List.of(new SimpleGrantedAuthority("ROLE_Admin")));
-        User user2 = new User("Ozzy", passwordEncoder.encode("password"),
-                List.of(new SimpleGrantedAuthority("ROLE_Manager")));
-
-        userList.add(user1);
-        userList.add(user2);
-
-        return new InMemoryUserDetailsManager(userList);
-    }
+//    @Bean
+//    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
+//
+//        List<UserDetails> userList = new ArrayList<>();
+//
+//        User user1 = new User("mike", passwordEncoder.encode("password"),
+//                List.of(new SimpleGrantedAuthority("ROLE_Admin")));
+//        User user2 = new User("Ozzy", passwordEncoder.encode("password"),
+//                List.of(new SimpleGrantedAuthority("ROLE_Manager")));
+//
+//        userList.add(user1);
+//        userList.add(user2);
+//
+//        return new InMemoryUserDetailsManager(userList);
+//    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         return http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/user/**").hasRole("Admin")
-                        .requestMatchers("/project/**").hasRole("Manager")
-                        .requestMatchers("/task/**").hasRole("Manager")
-                        .requestMatchers("/task/employee/**").hasRole("Employee")
+                        .requestMatchers("/user/**").hasAuthority("Admin")
+                        .requestMatchers("/project/**").hasAuthority("Manager")
+                        .requestMatchers("/task/employee/**").hasAuthority("Employee")
+                        .requestMatchers("/task/**").hasAuthority("Manager")
                         .requestMatchers(
                                 "/",
                                 "/login",
                                 "/fragments/**",
+                                "/assets/**",
                                 "/images/**"
                         ).permitAll()
                         .anyRequest().authenticated())
 //                .httpBasic(Customizer.withDefaults())
                 .formLogin(form -> form
                         .loginPage("/login")
+//                        .defaultSuccessUrl("/welcome")
                         .defaultSuccessUrl("/welcome")
                         .failureUrl("/login?error=true")
                         .permitAll()
