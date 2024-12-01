@@ -2,7 +2,7 @@
 
 <html xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="/fragments/head :: head"></head>
+<head th:replace="~{/fragments/head :: head}"></head>
 
 <body>
 <div class="splash-container">
@@ -11,7 +11,7 @@
             <img class="logo-img" th:src="@{/images/CydeoLogo_01.png}" height="45" alt="logo">
         </div>
         <div class="card-body">
-            <form th:action="@{/welcome}">
+            <form th:action="@{/login}" method="post">
                 <div class="form-group">
                     <label for="username">Email</label>:
                     <input type="text" id="username" name="username" class="form-control" placeholder="username"/>

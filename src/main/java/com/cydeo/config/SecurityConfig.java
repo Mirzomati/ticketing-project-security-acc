@@ -2,7 +2,6 @@ package com.cydeo.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -50,10 +49,18 @@ public class SecurityConfig {
                                 "/images/**"
                         ).permitAll()
                         .anyRequest().authenticated())
-                .httpBasic(Customizer.withDefaults())
+//                .httpBasic(Customizer.withDefaults())
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/welcome")
+                        .failureUrl("/login?error=true")
+                        .permitAll()
+                )
                 .build();
     }
 
+    /// .loginPage tells Spring Security to use our own page as the login form instead of the default one
+    /// if the login is successful, Spring Security will redirect the user to the welcome page
 
 
 
