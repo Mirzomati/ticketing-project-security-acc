@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDateTime;
 
@@ -30,16 +32,33 @@ public class BaseEntity {
 
     @PrePersist
     private void onPrePersist(){
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
         insertDateTime = LocalDateTime.now();
         lastUpdateDateTime = LocalDateTime.now();
-        insertUserId = 1L;
-        lastUpdateUserId = 1L;
+
+        if(authentication != null && !authentication.getName().equals("anonymousUser")) {
+
+            Object principal = authentication.getPrincipal();
+
+            insertUserId = ((UserPrincipal)principal).getId();
+            lastUpdateUserId = ((UserPrincipal)principal).getId();
+
+        }
     }
 
     @PreUpdate
     private void onPreUpdate(){
-        lastUpdateDateTime = LocalDateTime.now();
-        lastUpdateUserId = 1L;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if(authentication != null && !authentication.getName().equals("anonymousUser")) {
+
+            Object principal = authentication.getPrincipal();
+
+            lastUpdateUserId = ((UserPrincipal)principal).getId();
+
+        }
     }
 
 }

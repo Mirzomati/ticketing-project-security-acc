@@ -1,21 +1,23 @@
 package com.cydeo.config;
 
+import com.cydeo.service.SecurityService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 public class SecurityConfig {
+
+    private final SecurityService securityService;
+    private final AuthSuccessHandler authenticationSuccessHandler;
+
+    public SecurityConfig(SecurityService securityService, AuthSuccessHandler authenticationSuccessHandler) {
+        this.securityService = securityService;
+        this.authenticationSuccessHandler = authenticationSuccessHandler;
+    }
+
 
 //    @Bean
 //    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
@@ -53,16 +55,24 @@ public class SecurityConfig {
 //                .httpBasic(Customizer.withDefaults())
                 .formLogin(form -> form
                         .loginPage("/login")
-//                        .defaultSuccessUrl("/welcome")
-                        .defaultSuccessUrl("/welcome")
+//                        .defaultSuccessUrl("/welcome", true)
+                        .successHandler(authenticationSuccessHandler)
                         .failureUrl("/login?error=true")
-                        .permitAll()
+                        .permitAll())
+                .logout(logout -> logout
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                        .logoutSuccessUrl("/login"))
+                .rememberMe(remember -> remember
+                        .tokenValiditySeconds(120)
+                        .key("cydeo")
+                        .userDetailsService(securityService)
                 )
                 .build();
     }
 
     /// .loginPage tells Spring Security to use our own page as the login form instead of the default one
     /// if the login is successful, Spring Security will redirect the user to the welcome page
+    //.userDetailsService(securityService) is used to find who to remember
 
 
 
